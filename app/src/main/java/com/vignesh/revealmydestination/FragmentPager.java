@@ -12,7 +12,7 @@ import android.util.Log;
 
 public class FragmentPager extends FragmentPagerAdapter {
 
-    int pageCount = 1;
+    int pageCount = 2;
 
     public FragmentPager(FragmentManager fragmentManager){
         super(fragmentManager);
@@ -22,12 +22,10 @@ public class FragmentPager extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
+                ListTripFragment listTripFragment = new ListTripFragment();
+                return  listTripFragment;
+            case 1:
                 CreateTripFragment createTripFragment = new CreateTripFragment();
-                //createTripFragment.newInstance("param","param");
-                Bundle data = new Bundle();
-                data.putString("param1", "stri");
-                data.putString("param2", "stri");
-                createTripFragment.setArguments(data);
                 return createTripFragment;
             default:
                 return null;
@@ -38,4 +36,6 @@ public class FragmentPager extends FragmentPagerAdapter {
     public int getCount() {
         return this.pageCount;
     }
+
+
 }

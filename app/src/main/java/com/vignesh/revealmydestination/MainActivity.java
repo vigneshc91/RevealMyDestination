@@ -18,4 +18,8 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager.setAdapter(fragmentPager);
     }
+
+    public void setActionBarTitle(String title){
+        setTitle(title);
+    }
 }
