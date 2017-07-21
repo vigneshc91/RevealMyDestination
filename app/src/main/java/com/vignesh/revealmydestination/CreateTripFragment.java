@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.DatePicker;
+import android.widget.Toast;
 
 import com.akexorcist.googledirection.DirectionCallback;
 import com.akexorcist.googledirection.GoogleDirection;
@@ -34,12 +35,20 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.vignesh.revealmydestination.Helper.AppConstants;
+import com.vignesh.revealmydestination.Helper.Common;
+import com.vignesh.revealmydestination.Helper.SuccessConstants;
+import com.vignesh.revealmydestination.Model.Trip;
 
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
+import io.realm.Realm;
 
 
 /**
@@ -59,6 +68,9 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private Realm realm;
+
+    private String sourceLocation, destinationLocation;
 
     Calendar tripDate = Calendar.getInstance();
 
@@ -92,6 +104,7 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        realm = Realm.getDefaultInstance();
         ((MainActivity) getActivity()).setActionBarTitle("Create Trip");
 
         if (getArguments() != null) {
@@ -116,14 +129,36 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.createTripBtn:
+                createTrip();
                 return true;
             case R.id.tripDate:
                 this.showDatePicker(item);
-
+                Toast.makeText(getActivity(), SuccessConstants.TRIP_CREATED, Toast.LENGTH_SHORT);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void createTrip(){
+        realm.executeTransaction(new Realm.Transaction(){
+            @Override
+            public void execute(Realm realm) {
+                Trip trip = realm.createObject(Trip.class, UUID.randomUUID().toString());
+                trip.setSrc_location(sourceLocation);
+                trip.setSrc_latitude(latLngMap.get("source").latitude);
+                trip.setSrc_longitude(latLngMap.get("source").longitude);
+                trip.setDst_location(destinationLocation);
+                trip.setDst_latitude(latLngMap.get("destination").latitude);
+                trip.setDst_longitude(latLngMap.get("destination").longitude);
+                trip.setDate(tripDate.getTime());
+                trip.setCreated_at(new Date());
+                trip.setUpdated_at(new Date());
+            }
+        });
+
+//        Trip trip = new Trip(sourceLocation, String.valueOf(latLngMap.get("source").latitude), String.valueOf(latLngMap.get("source").longitude), destinationLocation, String.valueOf(latLngMap.get("destination").latitude), String.valueOf(latLngMap.get("destination").longitude), Common.getFormattedDate(tripDate.getTime()));
+//        trip.save();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -163,6 +198,8 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
                 Log.d("place", place.getName().toString());
                 Log.d("location", place.getLatLng().toString());
 
+                sourceLocation = place.getName().toString();
+
                 latLngMap.put("source", place.getLatLng());
                 if(latLngMap.get("source") != null && latLngMap.get("destination") != null){
 
@@ -183,6 +220,8 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
                 Log.d("place", place.getName().toString());
                 Log.d("location", place.getLatLng().toString());
 
+                destinationLocation = place.getName().toString();
+
                 latLngMap.put("destination", place.getLatLng());
 
                 if(latLngMap.get("source") != null && latLngMap.get("destination") != null){
@@ -200,7 +239,7 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void setMapWithDirection(){
-        GoogleDirection.withServerKey("AIzaSyAUHQMF36kAXv_3bMZ0yVILAiNOm4IU6V0")
+        GoogleDirection.withServerKey(AppConstants.GOOGLE_DIRECTIONS_API_KEY)
                 .from(new LatLng(latLngMap.get("source").latitude, latLngMap.get("source").longitude))
                 .to(new LatLng(latLngMap.get("destination").latitude,latLngMap.get("destination").longitude))
                 .execute(new DirectionCallback() {
