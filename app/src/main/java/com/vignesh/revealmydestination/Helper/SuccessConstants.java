@@ -7,4 +7,5 @@ package com.vignesh.revealmydestination.Helper;
 public class SuccessConstants {
 
     public static final String TRIP_CREATED = "Trip Created Sucessfully";
+
 }

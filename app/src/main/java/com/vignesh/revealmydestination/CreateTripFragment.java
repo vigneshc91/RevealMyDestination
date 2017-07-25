@@ -1,7 +1,9 @@
 package com.vignesh.revealmydestination;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -69,7 +71,8 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
     private String mParam1;
     private String mParam2;
     private Realm realm;
-
+    private Menu menu;
+    private PlaceAutocompleteFragment placeAutoSourceCompleteFragement, placeAutoDestinationCompleteFragement;
     private String sourceLocation, destinationLocation;
 
     Calendar tripDate = Calendar.getInstance();
@@ -121,6 +124,7 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        this.menu = menu;
         inflater.inflate(R.menu.create_trip_menu, menu);
     }
 
@@ -133,7 +137,6 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
                 return true;
             case R.id.tripDate:
                 this.showDatePicker(item);
-                Toast.makeText(getActivity(), SuccessConstants.TRIP_CREATED, Toast.LENGTH_SHORT);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -141,6 +144,17 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void createTrip(){
+        if(sourceLocation.length() == 0 || destinationLocation.length() == 0){
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Alert").setMessage("Choose Source and Destination to proceed");
+            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener(){
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+
+        }
         realm.executeTransaction(new Realm.Transaction(){
             @Override
             public void execute(Realm realm) {
@@ -154,11 +168,19 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
                 trip.setDate(tripDate.getTime());
                 trip.setCreated_at(new Date());
                 trip.setUpdated_at(new Date());
+                resetForm();
+                Toast.makeText(getActivity(), SuccessConstants.TRIP_CREATED, Toast.LENGTH_SHORT).show();
             }
         });
 
-//        Trip trip = new Trip(sourceLocation, String.valueOf(latLngMap.get("source").latitude), String.valueOf(latLngMap.get("source").longitude), destinationLocation, String.valueOf(latLngMap.get("destination").latitude), String.valueOf(latLngMap.get("destination").longitude), Common.getFormattedDate(tripDate.getTime()));
-//        trip.save();
+    }
+
+    private void resetForm(){
+        googleMap.clear();
+        placeAutoSourceCompleteFragement.setText("");
+        placeAutoDestinationCompleteFragement.setText("");
+        tripDate = Calendar.getInstance();
+        menu.findItem(R.id.tripDate).setTitle("Today");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -181,11 +203,8 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_create_trip, container, false);
 
-
-
-
-        PlaceAutocompleteFragment placeAutoSourceCompleteFragement = (PlaceAutocompleteFragment) getActivity().getFragmentManager().findFragmentById(R.id.place_autocomplete_source_fragment);
-        PlaceAutocompleteFragment placeAutoDestinationCompleteFragement = (PlaceAutocompleteFragment) getActivity().getFragmentManager().findFragmentById(R.id.place_autocomplete_destination_fragment);
+        placeAutoSourceCompleteFragement = (PlaceAutocompleteFragment) getActivity().getFragmentManager().findFragmentById(R.id.place_autocomplete_source_fragment);
+        placeAutoDestinationCompleteFragement = (PlaceAutocompleteFragment) getActivity().getFragmentManager().findFragmentById(R.id.place_autocomplete_destination_fragment);
 
         MapFragment googleMapFragment = (MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.gMap);
         googleMapFragment.getMapAsync(this);
@@ -246,6 +265,7 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
                     @Override
                     public void onDirectionSuccess(Direction direction, String rawBody) {
                         if(direction.isOK()){
+                            googleMap.clear();
                             googleMap.addMarker(new MarkerOptions().position(latLngMap.get("source")));
                             googleMap.addMarker(new MarkerOptions().position(latLngMap.get("destination")));
 

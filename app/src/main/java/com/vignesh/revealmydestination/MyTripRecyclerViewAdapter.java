@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.vignesh.revealmydestination.ListTripFragment.OnListFragmentInteractionListener;
+import com.vignesh.revealmydestination.Model.Trip;
 import com.vignesh.revealmydestination.dummy.DummyContent.DummyItem;
 
 import java.util.List;
@@ -18,10 +19,10 @@ import java.util.List;
  */
 public class MyTripRecyclerViewAdapter extends RecyclerView.Adapter<MyTripRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<Trip> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyTripRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+    public MyTripRecyclerViewAdapter(List<Trip> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -35,9 +36,9 @@ public class MyTripRecyclerViewAdapter extends RecyclerView.Adapter<MyTripRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        //holder.mItem = mValues.get(position);
+        holder.sourceLocation.setText(mValues.get(position).getSrc_location());
+        holder.destinationLocation.setText(mValues.get(position).getDst_location());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,7 +46,7 @@ public class MyTripRecyclerViewAdapter extends RecyclerView.Adapter<MyTripRecycl
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    //mListener.onListFragmentInteraction(holder.mItem);
                 }
             }
         });
@@ -58,20 +59,20 @@ public class MyTripRecyclerViewAdapter extends RecyclerView.Adapter<MyTripRecycl
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+        public final TextView sourceLocation;
+        public final TextView destinationLocation;
+
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            sourceLocation = (TextView) view.findViewById(R.id.tripSourceLocationText);
+            destinationLocation = (TextView) view.findViewById(R.id.tripDestinationLocationText);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + destinationLocation.getText() + "'";
         }
     }
 }

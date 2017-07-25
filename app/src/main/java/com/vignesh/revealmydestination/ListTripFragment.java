@@ -10,10 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.vignesh.revealmydestination.Model.Trip;
 import com.vignesh.revealmydestination.dummy.DummyContent;
 import com.vignesh.revealmydestination.dummy.DummyContent.DummyItem;
 
 import java.util.List;
+
+import io.realm.Realm;
 
 /**
  * A fragment representing a list of Items.
@@ -28,6 +31,8 @@ public class ListTripFragment extends Fragment {
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+
+    private Realm realm;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -49,7 +54,7 @@ public class ListTripFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        realm = Realm.getDefaultInstance();
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
@@ -69,7 +74,8 @@ public class ListTripFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyTripRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            List<Trip> trips = realm.where(Trip.class).findAll();
+            recyclerView.setAdapter(new MyTripRecyclerViewAdapter(trips, mListener));
         }
         return view;
     }
