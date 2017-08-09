@@ -25,6 +25,9 @@ public class Trip extends RealmObject {
     private Date created_at;
     private Date updated_at;
 
+    public String getId() {
+        return id;
+    }
 
     public String getSrc_location() {
         return src_location;

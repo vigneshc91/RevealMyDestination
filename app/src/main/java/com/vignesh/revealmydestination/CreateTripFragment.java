@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -61,15 +62,13 @@ import io.realm.Realm;
  * Use the {@link CreateTripFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
+public class CreateTripFragment extends Fragment implements OnMapReadyCallback, ListTripFragment.OnListFragmentInteractionListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM1 = "tripId";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
-    private String mParam2;
     private Realm realm;
     private Menu menu;
     private PlaceAutocompleteFragment placeAutoSourceCompleteFragement, placeAutoDestinationCompleteFragement;
@@ -89,16 +88,15 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param tripId Parameter 1.
      * @return A new instance of fragment CreateTripFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static CreateTripFragment newInstance(String param1, String param2) {
+    public static CreateTripFragment newInstance(String tripId) {
         CreateTripFragment fragment = new CreateTripFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_PARAM1, tripId);
+        Log.d("trip id", tripId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -112,7 +110,7 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            Log.d("trip value", mParam1);
         }
     }
 
@@ -305,6 +303,22 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onListFragmentInteraction(Trip trip) {
+        Log.d("trip list", trip.getId());
+        sourceLocation = trip.getSrc_location();
+        destinationLocation = trip.getDst_location();
+        latLngMap.put("source", new LatLng(trip.getSrc_latitude(), trip.getSrc_longitude()));
+        latLngMap.put("destination", new LatLng(trip.getDst_latitude(), trip.getDst_longitude()));
+        tripDate.setTime(trip.getDate());
+        placeAutoSourceCompleteFragement.setText(sourceLocation);
+        placeAutoDestinationCompleteFragement.setText(destinationLocation);
+        if(this.googleMap != null){
+            setMapWithDirection();
+        }
+
     }
 
     /**

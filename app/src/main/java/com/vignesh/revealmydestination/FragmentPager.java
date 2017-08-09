@@ -6,13 +6,17 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 
+import com.vignesh.revealmydestination.Model.Trip;
+
 /**
  * Created by vignesh on 18/6/17.
  */
 
-public class FragmentPager extends FragmentPagerAdapter {
+public class FragmentPager extends FragmentPagerAdapter implements ListTripFragment.OnListFragmentInteractionListener {
 
     int pageCount = 2;
+
+    public static String tripId = "";
 
     public FragmentPager(FragmentManager fragmentManager){
         super(fragmentManager);
@@ -27,6 +31,9 @@ public class FragmentPager extends FragmentPagerAdapter {
             case 1:
                 CreateTripFragment createTripFragment = new CreateTripFragment();
                 return createTripFragment;
+            case 2:
+                CreateTripFragment createTripFragment1 = CreateTripFragment.newInstance(tripId);
+                return  createTripFragment1;
             default:
                 return null;
         }
@@ -37,5 +44,8 @@ public class FragmentPager extends FragmentPagerAdapter {
         return this.pageCount;
     }
 
-
+    @Override
+    public void onListFragmentInteraction(Trip trip) {
+        new CreateTripFragment().onListFragmentInteraction(trip);
+    }
 }
