@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,6 +37,8 @@ public class ListTripFragment extends Fragment {
 
     private Realm realm;
 
+    private FloatingActionButton createTripBtn;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -58,6 +61,7 @@ public class ListTripFragment extends Fragment {
         super.onCreate(savedInstanceState);
         realm = Realm.getDefaultInstance();
         ((MainActivity) getActivity()).setActionBarTitle("Your Trip's");
+
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
@@ -70,18 +74,28 @@ public class ListTripFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_trip_list, container, false);
 
         // Set the adapter
-        if (view instanceof RecyclerView) {
+        if (view.findViewById(R.id.list) instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
             List<Trip> trips = realm.where(Trip.class).findAll();
-
+            Log.d("trip count", String.valueOf(trips.size()));
             recyclerView.setAdapter(new MyTripRecyclerViewAdapter(trips, mListener));
         }
+
+        createTripBtn = (FloatingActionButton) view.findViewById(R.id.createTripBtn);
+        final ViewPager viewPager = (ViewPager) getActivity().findViewById(R.id.viewPager);
+        createTripBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewPager.setCurrentItem(1);
+            }
+        });
+
         return view;
     }
 
