@@ -106,7 +106,6 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback, 
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         realm = Realm.getDefaultInstance();
-        ((MainActivity) getActivity()).setActionBarTitle("Create Trip");
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -307,12 +306,14 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback, 
 
     @Override
     public void onListFragmentInteraction(Trip trip) {
+        ((MainActivity)getActivity()).getViewPager().setCurrentItem(1);
         Log.d("trip list", trip.getId());
         sourceLocation = trip.getSrc_location();
         destinationLocation = trip.getDst_location();
         latLngMap.put("source", new LatLng(trip.getSrc_latitude(), trip.getSrc_longitude()));
         latLngMap.put("destination", new LatLng(trip.getDst_latitude(), trip.getDst_longitude()));
         tripDate.setTime(trip.getDate());
+//        menu.findItem(R.id.tripDate).setTitle(tripDate.get(Calendar.DAY_OF_MONTH) + " " + new DateFormatSymbols().getShortMonths()[tripDate.get(Calendar.MONTH)-1]);
         placeAutoSourceCompleteFragement.setText(sourceLocation);
         placeAutoDestinationCompleteFragement.setText(destinationLocation);
         if(this.googleMap != null){

@@ -19,10 +19,13 @@ public class MainActivity extends AppCompatActivity implements ListTripFragment.
 
     FragmentPager fragmentPager;
     ViewPager viewPager;
+
+    String[] pageTitles = {"Your Trips", "Create Trip"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setActionBarTitle(pageTitles[0]);
 
         Realm.init(this);
         RealmConfiguration realmConfiguration = new RealmConfiguration.Builder().build();
@@ -35,6 +38,27 @@ public class MainActivity extends AppCompatActivity implements ListTripFragment.
 
         viewPager.setAdapter(fragmentPager);
 
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                setActionBarTitle(pageTitles[position]);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+    }
+
+    public ViewPager getViewPager(){
+        return viewPager;
     }
 
     public void setActionBarTitle(String title){
@@ -44,8 +68,8 @@ public class MainActivity extends AppCompatActivity implements ListTripFragment.
     @Override
     public void onListFragmentInteraction(Trip trip) {
         Log.d("listener", trip.getSrc_location());
-//        fragmentPager.onListFragmentInteraction(trip);
-        FragmentPager.tripId = trip.getId();
-        viewPager.setCurrentItem(2);
+        fragmentPager.onListFragmentInteraction(trip);
+//        FragmentPager.tripId = trip.getId();
+//        viewPager.setCurrentItem(2);
     }
 }

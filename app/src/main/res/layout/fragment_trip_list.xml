@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="horizontal">
 
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -17,6 +17,9 @@
         app:layoutManager="LinearLayoutManager"
         tools:context="com.vignesh.revealmydestination.ListTripFragment"
         tools:listitem="@layout/fragment_trip">
+
+
+
 
 
     </android.support.v7.widget.RecyclerView>

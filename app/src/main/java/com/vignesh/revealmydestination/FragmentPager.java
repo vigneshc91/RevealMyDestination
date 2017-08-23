@@ -16,7 +16,8 @@ public class FragmentPager extends FragmentPagerAdapter implements ListTripFragm
 
     int pageCount = 2;
 
-    public static String tripId = "";
+    private ListTripFragment listTripFragment;
+    private CreateTripFragment createTripFragment;
 
     public FragmentPager(FragmentManager fragmentManager){
         super(fragmentManager);
@@ -26,14 +27,11 @@ public class FragmentPager extends FragmentPagerAdapter implements ListTripFragm
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                ListTripFragment listTripFragment = new ListTripFragment();
+                listTripFragment = new ListTripFragment();
                 return  listTripFragment;
             case 1:
-                CreateTripFragment createTripFragment = new CreateTripFragment();
+                createTripFragment = new CreateTripFragment();
                 return createTripFragment;
-            case 2:
-                CreateTripFragment createTripFragment1 = CreateTripFragment.newInstance(tripId);
-                return  createTripFragment1;
             default:
                 return null;
         }
@@ -46,6 +44,6 @@ public class FragmentPager extends FragmentPagerAdapter implements ListTripFragm
 
     @Override
     public void onListFragmentInteraction(Trip trip) {
-        new CreateTripFragment().onListFragmentInteraction(trip);
+        createTripFragment.onListFragmentInteraction(trip);
     }
 }

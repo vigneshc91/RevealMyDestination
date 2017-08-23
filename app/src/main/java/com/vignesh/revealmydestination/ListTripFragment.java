@@ -60,7 +60,6 @@ public class ListTripFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         realm = Realm.getDefaultInstance();
-        ((MainActivity) getActivity()).setActionBarTitle("Your Trip's");
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
@@ -72,6 +71,7 @@ public class ListTripFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trip_list, container, false);
+
 
         // Set the adapter
         if (view.findViewById(R.id.list) instanceof RecyclerView) {
