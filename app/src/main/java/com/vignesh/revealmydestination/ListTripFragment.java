@@ -38,6 +38,7 @@ public class ListTripFragment extends Fragment {
     private Realm realm;
 
     private FloatingActionButton createTripBtn;
+    RecyclerView recyclerView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -76,15 +77,14 @@ public class ListTripFragment extends Fragment {
         // Set the adapter
         if (view.findViewById(R.id.list) instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
+            recyclerView = (RecyclerView) view.findViewById(R.id.list);
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            List<Trip> trips = realm.where(Trip.class).findAll();
-            Log.d("trip count", String.valueOf(trips.size()));
-            recyclerView.setAdapter(new MyTripRecyclerViewAdapter(trips, mListener));
+
+            setData();
         }
 
         createTripBtn = (FloatingActionButton) view.findViewById(R.id.createTripBtn);
@@ -99,6 +99,14 @@ public class ListTripFragment extends Fragment {
         return view;
     }
 
+    private void setData(){
+        List<Trip> trips = realm.where(Trip.class).findAll();
+        Log.d("trip count", String.valueOf(trips.size()));
+        MyTripRecyclerViewAdapter myTripRecyclerViewAdapter =  new MyTripRecyclerViewAdapter(trips, mListener);
+        recyclerView.setAdapter(myTripRecyclerViewAdapter);
+        myTripRecyclerViewAdapter.notifyDataSetChanged();
+    }
+
 
     @Override
     public void onAttach(Context context) {
@@ -108,6 +116,15 @@ public class ListTripFragment extends Fragment {
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void setMenuVisibility(boolean menuVisible) {
+        super.setMenuVisibility(menuVisible);
+        if(menuVisible && realm != null){
+            Log.d("menu visibility", "called");
+            setData();
         }
     }
 

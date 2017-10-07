@@ -52,6 +52,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import io.realm.Realm;
+import io.realm.RealmQuery;
 
 
 /**
@@ -72,7 +73,9 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback, 
     private Realm realm;
     private Menu menu;
     private PlaceAutocompleteFragment placeAutoSourceCompleteFragement, placeAutoDestinationCompleteFragement;
-    private String sourceLocation, destinationLocation;
+    private String sourceLocation = "", destinationLocation = "";
+    private boolean isEdit = false;
+    private String editTripId = "";
 
     Calendar tripDate = Calendar.getInstance();
 
@@ -150,12 +153,30 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback, 
                     dialog.dismiss();
                 }
             });
-
-        }
-        realm.executeTransaction(new Realm.Transaction(){
-            @Override
-            public void execute(Realm realm) {
-                Trip trip = realm.createObject(Trip.class, UUID.randomUUID().toString());
+            builder.show();
+        } else {
+            if(!this.isEdit){
+                realm.executeTransaction(new Realm.Transaction(){
+                    @Override
+                    public void execute(Realm realm) {
+                        Trip trip = realm.createObject(Trip.class, UUID.randomUUID().toString());
+                        trip.setSrc_location(sourceLocation);
+                        trip.setSrc_latitude(latLngMap.get("source").latitude);
+                        trip.setSrc_longitude(latLngMap.get("source").longitude);
+                        trip.setDst_location(destinationLocation);
+                        trip.setDst_latitude(latLngMap.get("destination").latitude);
+                        trip.setDst_longitude(latLngMap.get("destination").longitude);
+                        trip.setDate(tripDate.getTime());
+                        trip.setCreated_at(new Date());
+                        trip.setUpdated_at(new Date());
+                        resetForm();
+                        Toast.makeText(getActivity(), SuccessConstants.TRIP_CREATED, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                RealmQuery<Trip> query = realm.where(Trip.class);
+                Trip trip = query.equalTo("id", this.editTripId).findFirst();
+                realm.beginTransaction();
                 trip.setSrc_location(sourceLocation);
                 trip.setSrc_latitude(latLngMap.get("source").latitude);
                 trip.setSrc_longitude(latLngMap.get("source").longitude);
@@ -163,12 +184,14 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback, 
                 trip.setDst_latitude(latLngMap.get("destination").latitude);
                 trip.setDst_longitude(latLngMap.get("destination").longitude);
                 trip.setDate(tripDate.getTime());
-                trip.setCreated_at(new Date());
                 trip.setUpdated_at(new Date());
+                realm.commitTransaction();
                 resetForm();
-                Toast.makeText(getActivity(), SuccessConstants.TRIP_CREATED, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), SuccessConstants.TRIP_EDITED, Toast.LENGTH_SHORT).show();
+                this.editTripId = "";
+                this.isEdit = false;
             }
-        });
+        }
 
     }
 
@@ -308,17 +331,19 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback, 
     public void onListFragmentInteraction(Trip trip) {
         ((MainActivity)getActivity()).getViewPager().setCurrentItem(1);
         Log.d("trip list", trip.getId());
+        this.editTripId = trip.getId();
         sourceLocation = trip.getSrc_location();
         destinationLocation = trip.getDst_location();
         latLngMap.put("source", new LatLng(trip.getSrc_latitude(), trip.getSrc_longitude()));
         latLngMap.put("destination", new LatLng(trip.getDst_latitude(), trip.getDst_longitude()));
         tripDate.setTime(trip.getDate());
-//        menu.findItem(R.id.tripDate).setTitle(tripDate.get(Calendar.DAY_OF_MONTH) + " " + new DateFormatSymbols().getShortMonths()[tripDate.get(Calendar.MONTH)-1]);
+        //menu.findItem(R.id.tripDate).setTitle(tripDate.get(Calendar.DAY_OF_MONTH) + " " + new DateFormatSymbols().getShortMonths()[tripDate.get(Calendar.MONTH)-1]);
         placeAutoSourceCompleteFragement.setText(sourceLocation);
         placeAutoDestinationCompleteFragement.setText(destinationLocation);
         if(this.googleMap != null){
             setMapWithDirection();
         }
+        this.isEdit = true;
 
     }
 

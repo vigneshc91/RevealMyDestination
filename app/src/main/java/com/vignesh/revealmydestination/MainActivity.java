@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity implements ListTripFragment.
     FragmentPager fragmentPager;
     ViewPager viewPager;
 
-    String[] pageTitles = {"Your Trips", "Create Trip"};
+    String[] pageTitles = {"Your Trips", "Create Trip", "Edit Trip"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements ListTripFragment.
     @Override
     public void onListFragmentInteraction(Trip trip) {
         Log.d("listener", trip.getSrc_location());
+        setActionBarTitle(pageTitles[2]);
         fragmentPager.onListFragmentInteraction(trip);
 //        FragmentPager.tripId = trip.getId();
 //        viewPager.setCurrentItem(2);
