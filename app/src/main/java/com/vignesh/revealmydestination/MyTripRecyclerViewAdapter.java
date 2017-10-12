@@ -1,6 +1,9 @@
 package com.vignesh.revealmydestination;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +13,7 @@ import com.vignesh.revealmydestination.ListTripFragment.OnListFragmentInteractio
 import com.vignesh.revealmydestination.Model.Trip;
 import com.vignesh.revealmydestination.dummy.DummyContent.DummyItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,6 +54,14 @@ public class MyTripRecyclerViewAdapter extends RecyclerView.Adapter<MyTripRecycl
                 }
             }
         });
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                view.setBackgroundColor(Color.BLUE);
+                Log.d("view long clicked", mValues.get(position).toString());
+                return true;
+            }
+        });
     }
 
     @Override
@@ -75,4 +87,5 @@ public class MyTripRecyclerViewAdapter extends RecyclerView.Adapter<MyTripRecycl
             return super.toString() + " '" + destinationLocation.getText() + "'";
         }
     }
+
 }

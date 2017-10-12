@@ -116,6 +116,7 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback, 
         }
     }
 
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
@@ -126,6 +127,12 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback, 
         super.onCreateOptionsMenu(menu, inflater);
         this.menu = menu;
         inflater.inflate(R.menu.create_trip_menu, menu);
+        if(this.isEdit){
+            menu.findItem(R.id.tripDate).setTitle(tripDate.get(Calendar.DAY_OF_MONTH) + " " + new DateFormatSymbols().getShortMonths()[tripDate.get(Calendar.MONTH)-1]);
+        } else {
+            tripDate = Calendar.getInstance();
+            menu.findItem(R.id.tripDate).setTitle("Today");
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -337,7 +344,6 @@ public class CreateTripFragment extends Fragment implements OnMapReadyCallback, 
         latLngMap.put("source", new LatLng(trip.getSrc_latitude(), trip.getSrc_longitude()));
         latLngMap.put("destination", new LatLng(trip.getDst_latitude(), trip.getDst_longitude()));
         tripDate.setTime(trip.getDate());
-        //menu.findItem(R.id.tripDate).setTitle(tripDate.get(Calendar.DAY_OF_MONTH) + " " + new DateFormatSymbols().getShortMonths()[tripDate.get(Calendar.MONTH)-1]);
         placeAutoSourceCompleteFragement.setText(sourceLocation);
         placeAutoDestinationCompleteFragement.setText(destinationLocation);
         if(this.googleMap != null){
